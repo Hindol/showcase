@@ -2,6 +2,8 @@ cmake_minimum_required( VERSION 2.8 )
 project( showcase )
 
 # Project-wide configurations
+include_directories( ${CMAKE_SOURCE_DIR}/src )
+
 IF( WIN32 )
     include_directories( "C:\\Program Files\\boost\\boost_1_51" )
 ELSEIF( UNIX )
