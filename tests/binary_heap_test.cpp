@@ -12,7 +12,7 @@ protected:
             std::numeric_limits<int>::min(),
             std::numeric_limits<int>::max());
 
-        for (int i = 0; i < 100000; ++i)
+        for (int i = 0; i < 1000000; ++i)
         {
             randArray.push_back(dist(gen));
         }
@@ -35,8 +35,7 @@ TEST_F(BinaryHeapTest, BinaryHeapCtor)
 
     EXPECT_EQ(randArray.size(), sorted.size());
 
-    EXPECT_EQ(sorted.end(), std::adjacent_find(sorted.begin(), sorted.end(),
-        std::greater<int>()));
+    EXPECT_TRUE(std::is_sorted(sorted.begin(), sorted.end(), std::less<int>()));
 }
 
 
@@ -57,8 +56,7 @@ TEST_F(BinaryHeapTest, BinaryHeapInsert)
 
     EXPECT_EQ(randArray.size(), sorted.size());
 
-    EXPECT_EQ(sorted.end(), std::adjacent_find(sorted.begin(), sorted.end(),
-        std::greater<int>()));
+    EXPECT_TRUE(std::is_sorted(sorted.begin(), sorted.end(), std::less<int>()));
 }
 
 
@@ -76,8 +74,7 @@ TEST_F(BinaryHeapTest, BinaryHeapInsertViaFwdIter)
 
     EXPECT_EQ(randArray.size(), sorted.size());
 
-    EXPECT_EQ(sorted.end(), std::adjacent_find(sorted.begin(), sorted.end(),
-        std::greater<int>()));
+    EXPECT_TRUE(std::is_sorted(sorted.begin(), sorted.end(), std::less<int>()));
 }
 
 
@@ -85,8 +82,7 @@ TEST_F(BinaryHeapTest, HeapSort)
 {
     heap::HeapSort(randArray.begin(), randArray.end());
 
-    EXPECT_EQ(randArray.end(), std::adjacent_find(randArray.begin(), randArray.end(),
-        std::greater<int>()));
+    EXPECT_TRUE(std::is_sorted(randArray.begin(), randArray.end(), std::less<int>()));
 }
 
 
@@ -94,5 +90,5 @@ TEST_F(BinaryHeapTest, HeapSortDescending)
 {
     heap::HeapSort(randArray.begin(), randArray.end(), std::greater<int>());
 
-    EXPECT_EQ(randArray.end(), std::adjacent_find(randArray.begin(), randArray.end()));
+    EXPECT_TRUE(std::is_sorted(randArray.begin(), randArray.end(), std::greater<int>()));
 }
