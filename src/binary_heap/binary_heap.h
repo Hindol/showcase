@@ -79,13 +79,14 @@ void Heapify(RandIt begin, RandIt end, Comp comp)
 template < typename RandIt, class Comp >
 void HeapSort(RandIt begin, RandIt end, Comp comp)
 {
-    std::binary_negate<Comp> notComp(comp);
-    Heapify(begin, end, notComp);
+    std::reverse_iterator<RandIt> rbegin(end);
+    std::reverse_iterator<RandIt> rend(begin);
+    Heapify(rbegin, rend, comp);
 
-    while (end != begin)
+    while (rend != rbegin)
     {
-        std::swap(*begin, *--end);
-        SiftDown(begin, end, 0, notComp);
+        std::swap(*rbegin, *--rend);
+        SiftDown(rbegin, rend, 0, comp);
     }
 }
 
