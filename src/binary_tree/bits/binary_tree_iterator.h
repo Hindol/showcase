@@ -179,10 +179,22 @@ private:
             if (stack_.top()->Right() != 0L && stack_.top()->Right() != nodePtr_)
             {
                 nodePtr_ = stack_.top()->Right();
-                while (nodePtr_->Left() != 0L)
+                while (true)
                 {
-                    stack_.push(nodePtr_);
-                    nodePtr_ = nodePtr_->Left();
+                    if (nodePtr_->Left() != 0L)
+                    {
+                        stack_.push(nodePtr_);
+                        nodePtr_ = nodePtr_->Left();
+                    }
+                    else if (nodePtr_->Right() != 0L)
+                    {
+                        stack_.push(nodePtr_);
+                        nodePtr_ = nodePtr_->Right();
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             else
