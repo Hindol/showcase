@@ -3,24 +3,47 @@ Binary Tree (C++)
 
 ### Let's build a tree, :)
 
+## Using in-order and pre-order traversal
+
 ```c++
 #include "binary_tree.h"
 
 int main()
 {
     using binary_tree::BinaryTree;
-    using binary_tree::BinaryTreeNode;
-    using binary_tree::MakeNode;
 
-    BinaryTree<int> tree;
-    tree.Root() = MakeNode<int>(5);
+    int inOrderTraversal[] = { 8, 9, 2, 4, 11, 13, 5 };
+    int preOrderTraversal[] = { 4, 9, 8, 2, 5, 11, 13 };
+    int postOrderTraversal[] = { 8, 2, 9, 13, 11, 5, 4 };
 
-    BinaryTreeNode<int>* leftSubtree = tree.Root()->Left() = MakeNode<int>(3);
-    BinaryTreeNode<int>* rightSubtree = tree.Root()->Right() = MakeNode<int>(7);
+    binary_tree::BinaryTree<int> tree(
+        std::begin(inOrderTraversal), std::end(inOrderTraversal),
+        binary_tree::BinaryTree<int>::PRE_ORDER, std::begin(preOrderTraversal), std::end(preOrderTraversal)
+        );
 
-    leftSubtree->Left() = MakeNode<int>(2);
-    leftSubtree->Right() = MakeNode<int>(4);
-    rightSubtree->Left() = MakeNode<int>(6);
+    ...
+
+    return 0;
+}
+```
+
+## Using in-order and post-order traversal
+
+```c++
+#include "binary_tree.h"
+
+int main()
+{
+    using binary_tree::BinaryTree;
+
+    int inOrderTraversal[] = { 8, 9, 2, 4, 11, 13, 5 };
+    int preOrderTraversal[] = { 4, 9, 8, 2, 5, 11, 13 };
+    int postOrderTraversal[] = { 8, 2, 9, 13, 11, 5, 4 };
+
+    binary_tree::BinaryTree<int> tree(
+        std::begin(inOrderTraversal), std::end(inOrderTraversal),
+        binary_tree::BinaryTree<int>::POST_ORDER, std::begin(postOrderTraversal), std::end(postOrderTraversal)
+        );
 
     ...
 
