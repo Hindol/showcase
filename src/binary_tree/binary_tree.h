@@ -54,6 +54,7 @@ public:
             root_ = BuildTreeFromInOrderPreOrder(beginInOrder, endInOrder, beginOtherOrder, endOtherOrder);
             break;
         case POST_ORDER:
+            root_ = BuildTreeFromInOrderPostOrder(beginInOrder, endInOrder, beginOtherOrder, endOtherOrder);
             break;
         case LEVEL_ORDER:
             break;
@@ -118,14 +119,14 @@ private:
         if (beginInOrder != endInOrder)
         {
             Node* root = MakeNode(*beginPreOrder);
-            FwdItFirst it = std::find(beginInOrder, endInOrder, *beginPreOrder);
-            auto leftSize = std::distance(beginInOrder, it);
+            FwdItFirst it = std::find(beginInOrder, endInOrder, root->Data());
+            auto leftSubtreeSize = std::distance(beginInOrder, it);
 
             if (beginInOrder != it)
             {
                 root->Left() = BuildTreeFromInOrderPreOrder(
                     beginInOrder, it,
-                    beginPreOrder + 1, beginPreOrder + 1 + leftSize
+                    beginPreOrder + 1, beginPreOrder + 1 + leftSubtreeSize
                     );
             }
 
@@ -133,7 +134,41 @@ private:
             {
                 root->Right() = BuildTreeFromInOrderPreOrder(
                     it + 1, endInOrder,
-                    beginPreOrder + 1 + leftSize, endPreOrder
+                    beginPreOrder + 1 + leftSubtreeSize, endPreOrder
+                    );
+            }
+
+            return root;
+        }
+        else
+        {
+            return 0L;
+        }
+    }
+
+    template <typename FwdItFirst, typename FwdItSecond>
+    Node* BuildTreeFromInOrderPostOrder(FwdItFirst beginInOrder, FwdItFirst endInOrder,
+        FwdItSecond beginPostOrder, FwdItSecond endPostOrder)
+    {
+        if (beginInOrder != endInOrder)
+        {
+            Node* root = MakeNode(*(endPostOrder - 1));
+            FwdItFirst it = std::find(beginInOrder, endInOrder, root->Data());
+            auto leftSubtreeSize = std::distance(beginInOrder, it);
+
+            if (leftSubtreeSize > 0) // If root has left subtree
+            {
+                root->Left() = BuildTreeFromInOrderPostOrder(
+                    beginInOrder, it,
+                    beginPostOrder, beginPostOrder + leftSubtreeSize
+                    );
+            }
+
+            if (it + 1 != endInOrder) // If root has right subtree
+            {
+                root->Right() = BuildTreeFromInOrderPostOrder(
+                    it + 1, endInOrder,
+                    beginPostOrder + leftSubtreeSize, endPostOrder - 1
                     );
             }
 
