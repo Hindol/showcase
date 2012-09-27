@@ -1,5 +1,5 @@
 add_library( binary_heap STATIC binary_heap.h )
-set_target_properties(binary_heap PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties( binary_heap PROPERTIES LINKER_LANGUAGE CXX )
 
 # CPack
 install(
