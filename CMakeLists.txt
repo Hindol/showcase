@@ -13,6 +13,7 @@ ENDIF( WIN32 )
 # Modules
 add_subdirectory( src/binary_heap )
 add_subdirectory( src/binary_tree )
+add_subdirectory( src/binary_search_tree )
 
 # GTest
 IF( MSVC_VERSION EQUAL 1700 )
