@@ -1,4 +1,11 @@
-add_executable( binary_tree_test binary_tree_test.cpp stdafx.cpp $<TARGET_OBJECTS:gtest_main> $<TARGET_OBJECTS:gtest> )
+add_executable(
+	binary_tree_test
+	binary_tree_test.cpp
+	stdafx.h
+	stdafx.cpp
+	$<TARGET_OBJECTS:gtest_main>
+	$<TARGET_OBJECTS:gtest>
+)
 add_test( NAME "Binary Tree Test" COMMAND binary_tree_test )
 
 # Precompiled headers

@@ -1,4 +1,11 @@
-add_executable( binary_heap_test binary_heap_test.cpp stdafx.cpp $<TARGET_OBJECTS:gtest_main> $<TARGET_OBJECTS:gtest> )
+add_executable(
+	binary_heap_test
+	binary_heap_test.cpp
+	stdafx.h
+	stdafx.cpp
+	$<TARGET_OBJECTS:gtest_main>
+	$<TARGET_OBJECTS:gtest>
+)
 add_test( NAME "Binary Heap Test" COMMAND binary_heap_test )
 
 # Precompiled headers
