@@ -27,20 +27,20 @@ TEST_F(BinaryTreeTest, BuildTreeFromInOrderPreOrder)
 {
     binary_tree::BinaryTree<int> btree(
         std::begin(inOrderTraversal), std::end(inOrderTraversal),
-        binary_tree::BinaryTree<int>::PRE_ORDER, std::begin(preOrderTraversal), std::end(preOrderTraversal)
+        binary_tree::PRE_ORDER, std::begin(preOrderTraversal), std::end(preOrderTraversal)
         );
 
     auto inOrderIt = btree.InOrderBegin();
     for (auto value : inOrderTraversal)
     {
-        EXPECT_EQ(value, inOrderIt->Data());
+        EXPECT_EQ(value, *inOrderIt);
         ++inOrderIt;
     }
 
     auto preOrderIt = btree.PreOrderBegin();
     for (auto value: preOrderTraversal)
     {
-        EXPECT_EQ(value, preOrderIt->Data());
+        EXPECT_EQ(value, *preOrderIt);
         ++preOrderIt;
     }
 }
@@ -50,20 +50,20 @@ TEST_F(BinaryTreeTest, BuildTreeFromInOrderPostOrder)
 {
     binary_tree::BinaryTree<int> btree(
         std::begin(inOrderTraversal), std::end(inOrderTraversal),
-        binary_tree::BinaryTree<int>::POST_ORDER, std::begin(postOrderTraversal), std::end(postOrderTraversal)
+        binary_tree::POST_ORDER, std::begin(postOrderTraversal), std::end(postOrderTraversal)
         );
 
     auto inOrderIt = btree.InOrderBegin();
     for (auto value : inOrderTraversal)
     {
-        EXPECT_EQ(value, inOrderIt->Data());
+        EXPECT_EQ(value, *inOrderIt);
         ++inOrderIt;
     }
 
     auto postOrderIt = btree.PostOrderBegin();
     for (auto value: postOrderTraversal)
     {
-        EXPECT_EQ(value, postOrderIt->Data());
+        EXPECT_EQ(value, *postOrderIt);
         ++postOrderIt;
     }
 }

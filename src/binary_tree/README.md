@@ -57,7 +57,7 @@ int main()
 BinaryTree<int>::PreOrderIterator it = tree.PreOrderBegin();
 for (; it != tree.PreOrderEnd(); ++it)
 {
-    std::cout << it->Data() << ", ";
+    std::cout << *it << ", ";
 }
 std::cout << "\n";
 ```
