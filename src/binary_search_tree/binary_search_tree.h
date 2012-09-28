@@ -1,26 +1,16 @@
 #pragma once
 
 
-#include "bits/binary_search_tree_node.h"
-#include "bits/binary_search_tree_iterator.h"
+#include <binary_tree/binary_tree.h>
 
 
-namespace tree {
+namespace binary_tree {
 
 
-template <typename T>
-class BinarySearchTree
+template <typename ValueType>
+class BinarySearchTree : public BinaryTree<ValueType>
 {
 public:
-    typedef T                                   value_type;
-    typedef T&                                  reference;
-    typedef const T&                            const_reference;
-    typedef BSTNode<T>                          node_type;
-    typedef BSTNode<T>&                         node_reference;
-    typedef BSTNode<T>*                         node_pointer;
-    typedef BSTIteratorBase<BSTNode<T> >        iterator;
-    typedef BSTIteratorBase<const BSTNode<T> >  const_iterator;
-
     BinarySearchTree(void)
         : root_(0L) {}
 
@@ -39,47 +29,7 @@ public:
     ~BinarySearchTree(void)
     { delete root_; /* Deleting the root frees up the whole tree */ }
 
-    iterator Find(const_reference value)
-    {
-        if (root_ == 0L)
-            return End();
-
-        node_pointer ptr = root_;
-        iterator it;
-        while (true)
-        {
-            if (value < ptr->Value())
-            {
-                if (ptr->LeftPtr() != 0L)
-                {
-                    it.stack_.push(ptr);
-                    ptr = ptr->LeftPtr();
-                }
-                else
-                {
-                    return End();
-                }
-            }
-            else if (value > ptr->Value())
-            {
-                if (ptr->RightPtr() != 0L)
-                {
-                    ptr = ptr->RightPtr();
-                }
-                else
-                {
-                    return End();
-                }
-            }
-            else
-            {
-                it.nodePtr_ = ptr;
-                return it;
-            }
-        }
-    }
-
-    void Insert(const_reference value)
+    void Insert(ConstReference value)
     {
         if (root_ == 0L)
         {
@@ -87,7 +37,7 @@ public:
             return;
         }
 
-        node_pointer ptr = root_;
+        NodePointer ptr = root_;
         while (true)
         {
             if (value < ptr->Value())
@@ -121,7 +71,7 @@ public:
         }
     }
 
-    void Remove(const_reference value)
+    void Remove(ConstReference value)
     {
         if (root_ != 0L)
         {
@@ -144,24 +94,52 @@ public:
         }
     }
 
-    const_iterator CBegin() const
-    { return const_iterator(*this); }
-
-    const_iterator CEnd() const
-    { return const_iterator(); }
-    
-    iterator Begin()
-    { return iterator(*this); }
-
-    iterator End()
-    { return iterator(); }
-
 private:
     template <class> friend class BSTIteratorBase;
 
+    Iterator Find(ConstReference value)
+    {
+        if (root_ == 0L)
+            return End();
+
+        NodePointer ptr = root_;
+        Iterator it;
+        while (true)
+        {
+            if (value < ptr->Value())
+            {
+                if (ptr->LeftPtr() != 0L)
+                {
+                    it.stack_.push(ptr);
+                    ptr = ptr->LeftPtr();
+                }
+                else
+                {
+                    return End();
+                }
+            }
+            else if (value > ptr->Value())
+            {
+                if (ptr->RightPtr() != 0L)
+                {
+                    ptr = ptr->RightPtr();
+                }
+                else
+                {
+                    return End();
+                }
+            }
+            else
+            {
+                it.nodePtr_ = ptr;
+                return it;
+            }
+        }
+    }
+
     // Remove value (if found) from the sub-tree held by root and return
     // the possibly new root of the subtree.
-    node_pointer Remove(node_pointer root, const_reference value)
+    NodePointer Remove(NodePointer root, ConstReference value)
     {
         if (root != 0L)
         {
@@ -179,8 +157,8 @@ private:
             {
                 if (root->LeftPtr() != 0L && root->RightPtr() != 0L)
                 {
-                    node_pointer parentOfLeftMax = root;
-                    node_pointer leftMax = root->LeftPtr();
+                    NodePointer parentOfLeftMax = root;
+                    NodePointer leftMax = root->LeftPtr();
                     if (leftMax->RightPtr() != 0L)
                     {
                         while (leftMax->RightPtr() != 0L)
@@ -211,14 +189,14 @@ private:
                 }
                 else if (root->LeftPtr() != 0L)
                 {
-                    node_pointer newRoot = root->LeftPtr();
+                    NodePointer newRoot = root->LeftPtr();
                     root->LeftPtr() = 0L;
                     delete root;
                     return newRoot;
                 }
                 else if (root->RightPtr() != 0L)
                 {
-                    node_pointer newRoot = root->RightPtr();
+                    NodePointer newRoot = root->RightPtr();
                     root->RightPtr() = 0L;
                     delete root;
                     return newRoot;
@@ -237,15 +215,15 @@ private:
     }
 
     /* Member variables. */
-    node_pointer root_;
+    NodePointer root_;
 };
 
 
 template <typename T>
-std::ostream& operator <<(std::ostream& os, tree::BinarySearchTree<T>& bst)
+std::ostream& operator <<(std::ostream& os, const BinarySearchTree<T>& bst)
 {
-    typedef typename tree::BinarySearchTree<T>::const_iterator const_iterator;
-    for (const_iterator it = bst.CBegin(); it != bst.CEnd(); ++it)
+    BinarySearchTree<T>::ConstInOrderIterator it;
+    for (it = bst.InOrderBegin(); it != bst.InOrderBegin(); ++it)
     {
         os << *it << ", ";
     }
@@ -253,5 +231,5 @@ std::ostream& operator <<(std::ostream& os, tree::BinarySearchTree<T>& bst)
 }
 
 
-} // tree
+} // binary_tree
 
