@@ -1,3 +1,8 @@
+IF( UNIX )
+    find_package( Threads REQUIRED )
+    set( LINUX_EXTRA_LIBS "${CMAKE_THREAD_LIBS_INIT}" )
+ENDIF( UNIX )
+
 add_executable(
 	binary_tree_test
 	binary_tree_test.cpp
@@ -6,6 +11,7 @@ add_executable(
 	$<TARGET_OBJECTS:gtest_main>
 	$<TARGET_OBJECTS:gtest>
 )
+target_link_libraries( binary_tree_test ${LINUX_EXTRA_LIBS} )
 add_test( NAME "Binary Tree Test" COMMAND binary_tree_test )
 
 # Precompiled headers
