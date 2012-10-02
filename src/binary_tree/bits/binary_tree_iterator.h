@@ -129,22 +129,22 @@ private:
 
     void increment()
     {
-        if (nodePtr_->left_ != 0L)
+        if (nodePtr_->leftPtr_ != 0L)
         {
             stack_.push_back(nodePtr_);
-            nodePtr_ = nodePtr_->left_;
+            nodePtr_ = nodePtr_->leftPtr_;
         }
         else
         {
-            if (nodePtr_->right_ != 0L)
+            if (nodePtr_->rightPtr_ != 0L)
             {
-                nodePtr_ = nodePtr_->right_;
+                nodePtr_ = nodePtr_->rightPtr_;
             }
             else
             {
                 if (!stack_.empty())
                 {
-                    nodePtr_ = stack_.back()->right_;
+                    nodePtr_ = stack_.back()->rightPtr_;
                     stack_.pop_back();
                 }
                 else
@@ -190,10 +190,10 @@ public:
     explicit InOrderIteratorBase(Tree& tree)
     {
         nodePtr_ = this->GetRoot(tree);
-        while (nodePtr_->left_ != 0L)
+        while (nodePtr_->leftPtr_ != 0L)
         {
             stack_.push_back(nodePtr_);
-            nodePtr_ = nodePtr_->left_;
+            nodePtr_ = nodePtr_->leftPtr_;
         }
     }
 
@@ -205,14 +205,14 @@ private:
 
     void increment()
     {
-        if (nodePtr_->right_ != 0L)
+        if (nodePtr_->rightPtr_ != 0L)
         {
-            nodePtr_ = nodePtr_->right_;
+            nodePtr_ = nodePtr_->rightPtr_;
 
-            while (nodePtr_->left_ != 0L)
+            while (nodePtr_->leftPtr_ != 0L)
             {
                 stack_.push_back(nodePtr_);
-                nodePtr_ = nodePtr_->left_;
+                nodePtr_ = nodePtr_->leftPtr_;
             }
         }
         else if (!stack_.empty())
@@ -263,16 +263,16 @@ public:
     {
         nodePtr_ = this->GetRoot(tree);
 
-        while (nodePtr_->left_ != 0L)
+        while (nodePtr_->leftPtr_ != 0L)
         {
             stack_.push_back(nodePtr_);
-            nodePtr_ = nodePtr_->left_;
+            nodePtr_ = nodePtr_->leftPtr_;
         }
 
-        while (nodePtr_->right_ != 0L)
+        while (nodePtr_->rightPtr_ != 0L)
         {
             stack_.push_back(nodePtr_);
-            nodePtr_ = nodePtr_->right_;
+            nodePtr_ = nodePtr_->rightPtr_;
         }
     }
 
@@ -286,20 +286,20 @@ private:
     {
         if (!stack_.empty())
         {
-            if (stack_.back()->right_ != 0L && stack_.back()->right_ != nodePtr_)
+            if (stack_.back()->rightPtr_ != 0L && stack_.back()->rightPtr_ != nodePtr_)
             {
-                nodePtr_ = stack_.back()->right_;
+                nodePtr_ = stack_.back()->rightPtr_;
                 while (true)
                 {
-                    if (nodePtr_->left_ != 0L)
+                    if (nodePtr_->leftPtr_ != 0L)
                     {
                         stack_.push_back(nodePtr_);
-                        nodePtr_ = nodePtr_->left_;
+                        nodePtr_ = nodePtr_->leftPtr_;
                     }
-                    else if (nodePtr_->right_ != 0L)
+                    else if (nodePtr_->rightPtr_ != 0L)
                     {
                         stack_.push_back(nodePtr_);
-                        nodePtr_ = nodePtr_->right_;
+                        nodePtr_ = nodePtr_->rightPtr_;
                     }
                     else
                     {

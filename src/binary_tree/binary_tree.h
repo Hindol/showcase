@@ -21,26 +21,28 @@ private:
         typedef T ValueType;
 
         BinaryTreeNodeBase()
-            : left_(0L), right_(0L) {}
+            : leftPtr_(0L), rightPtr_(0L) {}
 
         BinaryTreeNodeBase(const ValueType& data)
-            : left_(0L), right_(0L), data_(data) {}
+            : leftPtr_(0L), rightPtr_(0L), data_(data) {}
 
         ~BinaryTreeNodeBase()
         {
-            if (left_ != 0L) delete left_;
-            if (right_ != 0L) delete right_;
+            if (leftPtr_ != 0L) delete leftPtr_;
+            if (rightPtr_ != 0L) delete rightPtr_;
         }
 
         ValueType data_;
-        BinaryTreeNodeBase* left_;
-        BinaryTreeNodeBase* right_;
+        BinaryTreeNodeBase* leftPtr_;
+        BinaryTreeNodeBase* rightPtr_;
     };
 
 public:
     typedef T                                  ValueType;
     typedef ValueType&                         Reference;
     typedef const ValueType&                   ConstReference;
+    typedef ValueType*                         Pointer;
+    typedef const ValueType*                   ConstPointer;
 
 protected:
     typedef BinaryTreeNodeBase                 Node;
@@ -155,7 +157,7 @@ private:
 
             if (beginInOrder != it)
             {
-                root->left_ = BuildTreeFromInOrderPreOrder(
+                root->leftPtr_ = BuildTreeFromInOrderPreOrder(
                     beginInOrder, it,
                     beginPreOrder + 1, beginPreOrder + 1 + leftSubtreeSize
                     );
@@ -163,7 +165,7 @@ private:
 
             if (it + 1 != endInOrder)
             {
-                root->right_ = BuildTreeFromInOrderPreOrder(
+                root->rightPtr_ = BuildTreeFromInOrderPreOrder(
                     it + 1, endInOrder,
                     beginPreOrder + 1 + leftSubtreeSize, endPreOrder
                     );
@@ -189,7 +191,7 @@ private:
 
             if (leftSubtreeSize > 0) // If root has left subtree
             {
-                root->left_ = BuildTreeFromInOrderPostOrder(
+                root->leftPtr_ = BuildTreeFromInOrderPostOrder(
                     beginInOrder, it,
                     beginPostOrder, beginPostOrder + leftSubtreeSize
                     );
@@ -197,7 +199,7 @@ private:
 
             if (it + 1 != endInOrder) // If root has right subtree
             {
-                root->right_ = BuildTreeFromInOrderPostOrder(
+                root->rightPtr_ = BuildTreeFromInOrderPostOrder(
                     it + 1, endInOrder,
                     beginPostOrder + leftSubtreeSize, endPostOrder - 1
                     );

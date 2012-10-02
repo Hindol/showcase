@@ -7,13 +7,17 @@
 namespace binary_tree {
 
 
-template <typename ValueType>
-class BinarySearchTree : public BinaryTree<ValueType>
+template <typename T>
+class BinarySearchTree : public BinaryTree<T>
 {
 public:
-    typedef typename BinaryTree<ValueType>::Node Node;
-    typedef typename BinaryTree<ValueType>::NodePointer NodePointer;
+    typedef T ValueType;
+
+    typedef typename BinaryTree<ValueType>::Reference Reference;
     typedef typename BinaryTree<ValueType>::ConstReference ConstReference;
+
+    typedef typename BinaryTree<ValueType>::Pointer Pointer;
+    typedef typename BinaryTree<ValueType>::ConstPointer ConstPointer;
 
     typedef typename BinaryTree<ValueType>::PreOrderIterator PreOrderIterator;
     typedef typename BinaryTree<ValueType>::ConstPreOrderIterator ConstPreOrderIterator;
@@ -24,6 +28,11 @@ public:
     typedef typename BinaryTree<ValueType>::PostOrderIterator PostOrderIterator;
     typedef typename BinaryTree<ValueType>::ConstPostOrderIterator ConstPostOrderIterator;
 
+private:
+    typedef typename BinaryTree<ValueType>::Node Node;
+    typedef typename BinaryTree<ValueType>::NodePointer NodePointer;
+
+public:
     BinarySearchTree(void)
         : root_(0L) {}
 
@@ -53,27 +62,27 @@ public:
         NodePointer ptr = root_;
         while (true)
         {
-            if (value < ptr->Value())
+            if (value < ptr->data_)
             {
-                if (ptr->LeftPtr() != 0L)
+                if (ptr->leftPtr_ != 0L)
                 {
-                    ptr = ptr->LeftPtr();
+                    ptr = ptr->leftPtr_;
                 }
                 else
                 {
-                    ptr->LeftPtr() = new Node(value);
+                    ptr->leftPtr_ = new Node(value);
                     return;
                 }
             }
-            else if (value > ptr->Value())
+            else if (value > ptr->data_)
             {
-                if (ptr->RightPtr() != 0L)
+                if (ptr->rightPtr_ != 0L)
                 {
-                    ptr = ptr->RightPtr();
+                    ptr = ptr->rightPtr_;
                 }
                 else
                 {
-                    ptr->RightPtr() = new Node(value);
+                    ptr->rightPtr_ = new Node(value);
                     return;
                 }
             }
@@ -84,17 +93,21 @@ public:
         }
     }
 
+    /**
+     * @brief           Remove value (if found) from the tree
+     * @param[in] value The value to remove
+     */
     void Remove(ConstReference value)
     {
         if (root_ != 0L)
         {
-            if (value > root_->Value())
+            if (value > root_->data_)
             {
-                root_->RightPtr() = Remove(root_->RightPtr(), value);
+                root_->rightPtr_ = Remove(root_->rightPtr_, value);
             }
-            else if (value < root_->Value())
+            else if (value < root_->data_)
             {
-                root_->LeftPtr() = Remove(root_->LeftPtr(), value);
+                root_->leftPtr_ = Remove(root_->leftPtr_, value);
             }
             else
             {
@@ -108,8 +121,6 @@ public:
     }
 
 private:
-    template <class> friend class BSTIteratorBase;
-
     /**
      * @brief           Find a value (if exists), by starting at the root and going down the tree.
      * @param[in] value The value to search for.
@@ -118,29 +129,29 @@ private:
     InOrderIterator Find(ConstReference value)
     {
         if (root_ == 0L)
-            return this->End();
+            return this->InOrderEnd();
 
         NodePointer ptr = root_;
         InOrderIterator it;
         while (true)
         {
-            if (value < ptr->Value())
+            if (value < ptr->data_)
             {
-                if (ptr->LeftPtr() != 0L)
+                if (ptr->leftPtr_ != 0L)
                 {
                     it.stack_.push(ptr);
-                    ptr = ptr->LeftPtr();
+                    ptr = ptr->leftPtr_;
                 }
                 else
                 {
-                    return this->End();
+                    return this->InOrderEnd();
                 }
             }
-            else if (value > ptr->Value())
+            else if (value > ptr->data_)
             {
-                if (ptr->RightPtr() != 0L)
+                if (ptr->rightPtr_ != 0L)
                 {
-                    ptr = ptr->RightPtr();
+                    ptr = ptr->rightPtr_;
                 }
                 else
                 {
@@ -155,67 +166,71 @@ private:
         }
     }
 
-    // Remove value (if found) from the sub-tree held by root and return
-    // the possibly new root of the subtree.
+    /**
+     * @brief           Remove value (if found) from the sub-tree held by root
+     * @param[in] root  Root of the sub-tree
+     * @param[in] value The value to remove
+     * @return          New root of the subtree after removal
+     */
     NodePointer Remove(NodePointer root, ConstReference value)
     {
         if (root != 0L)
         {
-            if (value > root->Value())
+            if (value > root->data_)
             {
-                root->RightPtr() = Remove(root->RightPtr(), value);
+                root->rightPtr_ = Remove(root->rightPtr_, value);
                 return root;
             }
-            else if (value < root->Value())
+            else if (value < root->data_)
             {
-                root->LeftPtr() = Remove(root->LeftPtr(), value);
+                root->leftPtr_ = Remove(root->leftPtr_, value);
                 return root;
             }
             else // We have found the element
             {
-                if (root->LeftPtr() != 0L && root->RightPtr() != 0L)
+                if (root->leftPtr_ != 0L && root->rightPtr_ != 0L)
                 {
                     NodePointer parentOfLeftMax = root;
-                    NodePointer leftMax = root->LeftPtr();
-                    if (leftMax->RightPtr() != 0L)
+                    NodePointer leftMax = root->leftPtr_;
+                    if (leftMax->rightPtr_ != 0L)
                     {
-                        while (leftMax->RightPtr() != 0L)
+                        while (leftMax->rightPtr_ != 0L)
                         {
                             parentOfLeftMax = leftMax;
-                            leftMax = leftMax->RightPtr();
+                            leftMax = leftMax->rightPtr_;
                         }
 
-                        parentOfLeftMax->RightPtr() = leftMax->LeftPtr();
+                        parentOfLeftMax->rightPtr_ = leftMax->leftPtr_;
 
                         // leftMax is now completely detached from tree except that
-                        // it has a redundant LeftPtr().
-                        leftMax->LeftPtr() = root->LeftPtr();
-                        leftMax->RightPtr() = root->RightPtr();
+                        // it has a redundant leftPtr_.
+                        leftMax->leftPtr_ = root->leftPtr_;
+                        leftMax->rightPtr_ = root->rightPtr_;
 
-                        root->LeftPtr() = 0L;
-                        root->RightPtr() = 0L;
+                        root->leftPtr_ = 0L;
+                        root->rightPtr_ = 0L;
                         delete root;
                         return leftMax;
                     }
-                    else // root->LeftPtr() == leftMax and leftMax has only LeftPtr()
+                    else // root->leftPtr_ == leftMax and leftMax has only leftPtr_
                     {
-                        leftMax->RightPtr() = root->RightPtr();
-                        root->LeftPtr() = 0L;
+                        leftMax->rightPtr_ = root->rightPtr_;
+                        root->leftPtr_ = 0L;
                         delete root;
                         return leftMax;
                     }
                 }
-                else if (root->LeftPtr() != 0L)
+                else if (root->leftPtr_ != 0L)
                 {
-                    NodePointer newRoot = root->LeftPtr();
-                    root->LeftPtr() = 0L;
+                    NodePointer newRoot = root->leftPtr_;
+                    root->leftPtr_ = 0L;
                     delete root;
                     return newRoot;
                 }
-                else if (root->RightPtr() != 0L)
+                else if (root->rightPtr_ != 0L)
                 {
-                    NodePointer newRoot = root->RightPtr();
-                    root->RightPtr() = 0L;
+                    NodePointer newRoot = root->rightPtr_;
+                    root->rightPtr_ = 0L;
                     delete root;
                     return newRoot;
                 }
