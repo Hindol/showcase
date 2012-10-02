@@ -65,7 +65,7 @@ void SiftDown(RandIt begin, RandIt end, std::size_t offset, Comp comp)
 }
 
 template < typename RandIt, class Comp >
-void Heapify(RandIt begin, RandIt end, Comp comp)
+void MakeHeap(RandIt begin, RandIt end, Comp comp)
 {
     std::size_t size = std::distance( begin, end );
 
@@ -81,7 +81,7 @@ void HeapSort(RandIt begin, RandIt end, Comp comp)
 {
     std::reverse_iterator<RandIt> rbegin(end);
     std::reverse_iterator<RandIt> rend(begin);
-    Heapify(rbegin, rend, comp);
+    MakeHeap(rbegin, rend, comp);
 
     while (rend != rbegin)
     {
@@ -148,7 +148,7 @@ public:
     void Insert(const FwdIter begin, const FwdIter end)
     {
         std::copy( begin, end, std::back_inserter(elems) );
-        ::heap::Heapify(elems.begin(), elems.end(), comp);
+        ::heap::MakeHeap(elems.begin(), elems.end(), comp);
     }
 
     friend void swap(BinaryHeap& left, BinaryHeap& right)
