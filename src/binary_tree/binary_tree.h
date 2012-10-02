@@ -11,14 +11,14 @@ namespace binary_tree {
 enum TraversalOrder { PRE_ORDER, POST_ORDER, LEVEL_ORDER };
 
 
-template <class ValueType>
+template <class T>
 class BinaryTree
 {
     template <typename> friend class BinaryTreeIteratorBase;
 private:
     struct BinaryTreeNodeBase
     {
-        typedef typename BinaryTree::ValueType ValueType;
+        typedef T ValueType;
 
         BinaryTreeNodeBase()
             : left_(0L), right_(0L) {}
@@ -38,7 +38,7 @@ private:
     };
 
 public:
-    typedef ValueType                          ValueType;
+    typedef T                                  ValueType;
     typedef ValueType&                         Reference;
     typedef const ValueType&                   ConstReference;
 

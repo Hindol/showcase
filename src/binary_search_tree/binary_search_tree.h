@@ -11,6 +11,19 @@ template <typename ValueType>
 class BinarySearchTree : public BinaryTree<ValueType>
 {
 public:
+    typedef typename BinaryTree<ValueType>::Node Node;
+    typedef typename BinaryTree<ValueType>::NodePointer NodePointer;
+    typedef typename BinaryTree<ValueType>::ConstReference ConstReference;
+
+    typedef typename BinaryTree<ValueType>::PreOrderIterator PreOrderIterator;
+    typedef typename BinaryTree<ValueType>::ConstPreOrderIterator ConstPreOrderIterator;
+
+    typedef typename BinaryTree<ValueType>::InOrderIterator InOrderIterator;
+    typedef typename BinaryTree<ValueType>::ConstInOrderIterator ConstInOrderIterator;
+
+    typedef typename BinaryTree<ValueType>::PostOrderIterator PostOrderIterator;
+    typedef typename BinaryTree<ValueType>::ConstPostOrderIterator ConstPostOrderIterator;
+
     BinarySearchTree(void)
         : root_(0L) {}
 
@@ -33,7 +46,7 @@ public:
     {
         if (root_ == 0L)
         {
-            root_ = new node_type(value);
+            root_ = new Node(value);
             return;
         }
 
@@ -48,7 +61,7 @@ public:
                 }
                 else
                 {
-                    ptr->LeftPtr() = new node_type(value);
+                    ptr->LeftPtr() = new Node(value);
                     return;
                 }
             }
@@ -60,7 +73,7 @@ public:
                 }
                 else
                 {
-                    ptr->RightPtr() = new node_type(value);
+                    ptr->RightPtr() = new Node(value);
                     return;
                 }
             }
@@ -97,13 +110,18 @@ public:
 private:
     template <class> friend class BSTIteratorBase;
 
-    Iterator Find(ConstReference value)
+    /**
+     * @brief           Find a value (if exists), by starting at the root and going down the tree.
+     * @param[in] value The value to search for.
+     * @return          An in-order iterator pointing to the value (if found) OR InOrderEnd().
+     */
+    InOrderIterator Find(ConstReference value)
     {
         if (root_ == 0L)
-            return End();
+            return this->End();
 
         NodePointer ptr = root_;
-        Iterator it;
+        InOrderIterator it;
         while (true)
         {
             if (value < ptr->Value())
@@ -115,7 +133,7 @@ private:
                 }
                 else
                 {
-                    return End();
+                    return this->End();
                 }
             }
             else if (value > ptr->Value())
@@ -126,7 +144,7 @@ private:
                 }
                 else
                 {
-                    return End();
+                    return this->InOrderEnd();
                 }
             }
             else
@@ -222,8 +240,7 @@ private:
 template <typename T>
 std::ostream& operator <<(std::ostream& os, const BinarySearchTree<T>& bst)
 {
-    BinarySearchTree<T>::ConstInOrderIterator it;
-    for (it = bst.InOrderBegin(); it != bst.InOrderBegin(); ++it)
+    for (auto it = bst.InOrderBegin(); it != bst.InOrderEnd(); ++it)
     {
         os << *it << ", ";
     }
@@ -232,4 +249,3 @@ std::ostream& operator <<(std::ostream& os, const BinarySearchTree<T>& bst)
 
 
 } // binary_tree
-

@@ -1,10 +1,12 @@
 #pragma once
 
 
+#include <algorithm>
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <stack>
+#include <deque>
+#include <iterator>
 
 
 namespace binary_tree {
@@ -25,24 +27,25 @@ struct ValueTypeOf<T const>
 
 
 template <class Node>
-class BinaryTreeIteratorBase : public boost::iterator_facade<
-    BinaryTreeIteratorBase<Node>,
-    typename ValueTypeOf<Node>::Type,
-    boost::forward_traversal_tag
->
+class BinaryTreeIteratorBase
 {
+    template <class> friend class BinaryTreeIteratorBase;
+
 public:
-    typedef typename ValueTypeOf<Node>::Type ValueType;
-    typedef ValueType& Reference;
-    typedef const ValueType& ConstReference;
+    typedef typename ValueTypeOf<Node>::Type value_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
 
 protected:
-    typedef Node* NodePointer;
+    typedef Node node_type;
+    typedef node_type* node_pointer;
 
     BinaryTreeIteratorBase()
         : nodePtr_(0L) {}
 
-    explicit BinaryTreeIteratorBase(NodePointer node)
+    explicit BinaryTreeIteratorBase(node_pointer node)
         : nodePtr_(node) {}
 
     ~BinaryTreeIteratorBase() // A protected destructor prevents deletion of derived class via base class ptr
@@ -51,7 +54,7 @@ protected:
 private:
     struct enabler {};
 
-protected:
+public:
     template <class OtherNode>
     BinaryTreeIteratorBase(
         const BinaryTreeIteratorBase<OtherNode>& other,
@@ -60,45 +63,67 @@ protected:
             enabler
         >::type = enabler()
         )
-        : nodePtr_(other.nodePtr_), stack_(other.stack_) {}
+        : nodePtr_(other.nodePtr_)
+    {
+        std::copy(std::begin(other.stack_), std::end(other.stack_), std::begin(stack_));
+    }
 
     template <class Tree>
-    NodePointer GetRoot(Tree& tree)
+    node_pointer GetRoot(Tree& tree)
     { return tree.root_; }
 
-private:
-    friend class boost::iterator_core_access;
-
-    bool equal(const BinaryTreeIteratorBase& other) const
+    template <class OtherNode>
+    bool equal(const BinaryTreeIteratorBase<OtherNode>& other) const
     { return nodePtr_ == other.nodePtr_; }
 
     void increment()
     {}
 
-    Reference dereference() const
+    reference dereference() const
     { return nodePtr_->data_; }
 
 protected:
-    NodePointer nodePtr_;
-    std::stack<NodePointer> stack_;
+    node_pointer nodePtr_;
+    std::deque<node_pointer> stack_;
 };
 
 
 template <class Node>
-class PreOrderIteratorBase : public BinaryTreeIteratorBase<Node>
+class PreOrderIteratorBase : public BinaryTreeIteratorBase<Node>, public boost::iterator_facade<
+        PreOrderIteratorBase<Node>,
+        typename ValueTypeOf<Node>::Type,
+        boost::forward_traversal_tag
+    >
 {
+public:
+    typedef typename ValueTypeOf<Node>::Type value_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
+
+private:
+    typedef typename BinaryTreeIteratorBase<Node>::node_type node_type;
+    typedef typename BinaryTreeIteratorBase<Node>::node_pointer node_pointer;
+
 public:
     PreOrderIteratorBase()
     {}
 
-    explicit PreOrderIteratorBase(NodePointer node)
+    explicit PreOrderIteratorBase(node_pointer node)
         : BinaryTreeIteratorBase<Node>(node) {}
+
+    template <class OtherNode>
+    PreOrderIteratorBase(const PreOrderIteratorBase<OtherNode>& other)
+        : BinaryTreeIteratorBase<Node>(other) {}
 
     template <class Tree>
     explicit PreOrderIteratorBase(Tree& tree)
-    { nodePtr_ = GetRoot(tree); }
+    { nodePtr_ = this->GetRoot(tree); }
 
 private:
+    friend class boost::iterator_core_access;
+
     using BinaryTreeIteratorBase<Node>::nodePtr_;
     using BinaryTreeIteratorBase<Node>::stack_;
 
@@ -106,7 +131,7 @@ private:
     {
         if (nodePtr_->left_ != 0L)
         {
-            stack_.push(nodePtr_);
+            stack_.push_back(nodePtr_);
             nodePtr_ = nodePtr_->left_;
         }
         else
@@ -119,8 +144,8 @@ private:
             {
                 if (!stack_.empty())
                 {
-                    nodePtr_ = stack_.top()->right_;
-                    stack_.pop();
+                    nodePtr_ = stack_.back()->right_;
+                    stack_.pop_back();
                 }
                 else
                 {
@@ -133,29 +158,48 @@ private:
 
 
 template <class Node>
-class InOrderIteratorBase : public BinaryTreeIteratorBase<Node>
+class InOrderIteratorBase : public BinaryTreeIteratorBase<Node>, public boost::iterator_facade<
+        InOrderIteratorBase<Node>,
+        typename ValueTypeOf<Node>::Type,
+        boost::forward_traversal_tag
+    >
 {
-    template <class> friend class BinaryTreeIteratorBase;
+public:
+    typedef typename ValueTypeOf<Node>::Type value_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
+
+private:
+    typedef typename BinaryTreeIteratorBase<Node>::node_type node_type;
+    typedef typename BinaryTreeIteratorBase<Node>::node_pointer node_pointer;
 
 public:
     InOrderIteratorBase()
     {}
 
-    explicit InOrderIteratorBase(NodePointer node)
+    explicit InOrderIteratorBase(node_pointer node)
         : BinaryTreeIteratorBase<Node>(node) {}
+
+    template <class OtherNode>
+    InOrderIteratorBase(const InOrderIteratorBase<OtherNode>& other)
+        : BinaryTreeIteratorBase<Node>(other) {}
 
     template <class Tree>
     explicit InOrderIteratorBase(Tree& tree)
     {
-        nodePtr_ = GetRoot(tree);
+        nodePtr_ = this->GetRoot(tree);
         while (nodePtr_->left_ != 0L)
         {
-            stack_.push(nodePtr_);
+            stack_.push_back(nodePtr_);
             nodePtr_ = nodePtr_->left_;
         }
     }
 
 private:
+    friend class boost::iterator_core_access;
+
     using BinaryTreeIteratorBase<Node>::nodePtr_;
     using BinaryTreeIteratorBase<Node>::stack_;
 
@@ -167,52 +211,74 @@ private:
 
             while (nodePtr_->left_ != 0L)
             {
-                stack_.push(nodePtr_);
+                stack_.push_back(nodePtr_);
                 nodePtr_ = nodePtr_->left_;
             }
         }
         else if (!stack_.empty())
         {
-            nodePtr_ = stack_.top();
-            stack_.pop();
+            nodePtr_ = stack_.back();
+            stack_.pop_back();
         }
         else
         {
             nodePtr_ = 0L;
         }
     }
+
+    reference dereference() const
+    {
+        return nodePtr_->data_;
+    }
 };
 
 
 template <class Node>
-class PostOrderIteratorBase : public BinaryTreeIteratorBase<Node>
+class PostOrderIteratorBase : public BinaryTreeIteratorBase<Node>, public boost::iterator_facade<
+        PostOrderIteratorBase<Node>,
+        typename ValueTypeOf<Node>::Type,
+        boost::forward_traversal_tag
+    >
 {
+public:
+    typedef typename ValueTypeOf<Node>::Type value_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
+
+private:
+    typedef typename BinaryTreeIteratorBase<Node>::node_type node_type;
+    typedef typename BinaryTreeIteratorBase<Node>::node_pointer node_pointer;
+
 public:
     PostOrderIteratorBase()
     {}
 
-    explicit PostOrderIteratorBase(NodePointer node)
+    explicit PostOrderIteratorBase(node_pointer node)
         : BinaryTreeIteratorBase<Node>(node) {}
 
     template <class Tree>
     explicit PostOrderIteratorBase(Tree& tree)
     {
-        nodePtr_ = GetRoot(tree);
+        nodePtr_ = this->GetRoot(tree);
 
         while (nodePtr_->left_ != 0L)
         {
-            stack_.push(nodePtr_);
+            stack_.push_back(nodePtr_);
             nodePtr_ = nodePtr_->left_;
         }
 
         while (nodePtr_->right_ != 0L)
         {
-            stack_.push(nodePtr_);
+            stack_.push_back(nodePtr_);
             nodePtr_ = nodePtr_->right_;
         }
     }
 
 private:
+    friend class boost::iterator_core_access;
+
     using BinaryTreeIteratorBase<Node>::nodePtr_;
     using BinaryTreeIteratorBase<Node>::stack_;
 
@@ -220,19 +286,19 @@ private:
     {
         if (!stack_.empty())
         {
-            if (stack_.top()->right_ != 0L && stack_.top()->right_ != nodePtr_)
+            if (stack_.back()->right_ != 0L && stack_.back()->right_ != nodePtr_)
             {
-                nodePtr_ = stack_.top()->right_;
+                nodePtr_ = stack_.back()->right_;
                 while (true)
                 {
                     if (nodePtr_->left_ != 0L)
                     {
-                        stack_.push(nodePtr_);
+                        stack_.push_back(nodePtr_);
                         nodePtr_ = nodePtr_->left_;
                     }
                     else if (nodePtr_->right_ != 0L)
                     {
-                        stack_.push(nodePtr_);
+                        stack_.push_back(nodePtr_);
                         nodePtr_ = nodePtr_->right_;
                     }
                     else
@@ -243,8 +309,8 @@ private:
             }
             else
             {
-                nodePtr_ = stack_.top();
-                stack_.pop();
+                nodePtr_ = stack_.back();
+                stack_.pop_back();
             }
         }
         else
