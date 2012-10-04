@@ -1,7 +1,7 @@
 set( CMAKE_C_COMPILER clang )
 set( CMAKE_CXX_COMPILER clang++ )
 
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 2.8.8 FATAL_ERROR )
 project( showcase )
 
 # Project-wide configurations
@@ -21,6 +21,7 @@ ENDIF( WIN32 )
 add_subdirectory( src/binary_heap )
 add_subdirectory( src/binary_tree )
 add_subdirectory( src/binary_search_tree )
+add_subdirectory( src/avl_tree )
 
 # GTest
 IF( MSVC_VERSION EQUAL 1700 )
